@@ -3,10 +3,6 @@
 .idea/
 *.iml
 
-# Java build outputs
-**/out/
-**/bin/
-*.class
 
 # JavaFX runtime cache
 javafx-cache/
