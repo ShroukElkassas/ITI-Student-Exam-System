@@ -7,6 +7,7 @@ SQL Server database schema + stored procedures, plus a JavaFX Desktop client (OO
 - [ERD](#erd)
 - [Database Setup](#database-setup)
 - [Desktop Client](#desktop-client)
+- [Media](#media)
 - [Roles & Logins](#roles--logins)
 - [Sample Data](#sample-data)
 - [Project Structure](#project-structure)
@@ -76,6 +77,18 @@ It compiles `DesktopClient/src/Main.java` into `DesktopClient/out` and launches 
 - Exams (Admin + Instructor)
 - Reports (all roles; Student role sees only “Student Grades”)
 - Procedures (Admin + Instructor)
+
+## Media
+
+### Screenshots
+
+![Login by role](media/Login%20by%20role.png)
+
+![CRUD Operations](media/Crud%20Operations.png)
+
+### Video
+
+- [Project Preview Video](media/Project%20Preview%20Video.mp4)
 
 ## Roles & Logins
 
