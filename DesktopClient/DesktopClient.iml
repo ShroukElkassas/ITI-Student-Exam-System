@@ -11,6 +11,9 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/mssql-jdbc-12.6.1.jre8.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/javafx/javafx-base-25-win.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/javafx/javafx-graphics-25-win.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/javafx/javafx-controls-25-win.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
