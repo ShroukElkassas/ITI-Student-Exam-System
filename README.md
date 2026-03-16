@@ -1,158 +1,114 @@
-# ITI Student Exam System (SQL Server)
+# ITI Student Exam System
 
-Database schema + stored procedures for an ITI-style examination system: branches/tracks/courses, question bank, exam generation, student submissions, auto-correction, and reporting.
+SQL Server database schema + stored procedures, plus a JavaFX Desktop client (OOP controllers) for managing branches/tracks/courses/students/instructors/exams and viewing reports.
 
 ## Contents
 
 - [ERD](#erd)
-- [Tech](#tech)
-- [Setup](#setup)
-- [Key Stored Procedures](#key-stored-procedures)
-- [Reports](#reports)
-- [Roles & Permissions](#roles--permissions)
-- [Team](#team)
+- [Database Setup](#database-setup)
+- [Desktop Client](#desktop-client)
+- [Roles & Logins](#roles--logins)
+- [Sample Data](#sample-data)
 - [Project Structure](#project-structure)
 
 ## ERD
 
 ![ERD](ERD/ERD.png)
 
-## Tech
+## Database Setup
 
-- Microsoft SQL Server (T-SQL)
+### Prerequisites
+
+- Microsoft SQL Server
 - SSMS / Azure Data Studio (or any SQL client that can run `.sql` scripts)
 
-## Setup
+### Recommended script order
 
-1. Open SQL Server Management Studio (SSMS).
-2. Run the scripts in this recommended order:
+Run scripts from the [Database/](Database/) folder in this order:
 
-   1. [CreateDbTables.sql](CreateDbTables.sql) (creates `ITI_ExaminationDB` and all tables)
-   2. CRUD stored procedures:
-      - [BranchCRUD_SP.sql](BranchCRUD_SP.sql)
-      - [TrackCRUD_sp.sql](TrackCRUD_sp.sql)
-      - [CourseCRUD_sp.sql](CourseCRUD_sp.sql)
-   3. Exam + submission + correction procedures:
-      - [ExamCRUD_SP.sql](ExamCRUD_SP.sql)
-   4. Reports procedures (if you prefer them separated):
-      - [REPORTS_SP.sql](REPORTS_SP.sql)
-   5. Users/roles (optional):
-      - [UserRoles&Enviroment.sql](UserRoles&Enviroment.sql)
-   6. Sample seed data:
-      - [sample-data.sql](sample-data.sql)
+1. Schema (creates `ITI_ExaminationDB` and all tables)
+   - [CreateDbTables.sql](Database/CreateDbTables.sql)
+2. CRUD stored procedures
+   - [BranchCRUD_SP.sql](Database/BranchCRUD_SP.sql)
+   - [TrackCRUD_sp.sql](Database/TrackCRUD_sp.sql)
+   - [CourseCRUD_sp.sql](Database/CourseCRUD_sp.sql)
+3. Exam + question bank + submission/correction + extra CRUD
+   - [ExamCRUD_SP.sql](Database/ExamCRUD_SP.sql)
+4. Reports (separated)
+   - [REPORTS_SP.sql](Database/REPORTS_SP.sql)
+5. Users / roles / permissions (safe to re-run)
+   - [UserRoles&Enviroment.sql](Database/UserRoles&Enviroment.sql)
+6. Seed data
+   - [sample-data.sql](Database/sample-data.sql)
+7. Extra seed data (exams + grades)
+   - [sample-exams-and-grades.sql](Database/sample-exams-and-grades.sql)
+8. Utilities (optional)
+   - Randomly assign students without any track:
+     - [assign-students-to-tracks-random.sql](Database/assign-students-to-tracks-random.sql)
+   - Select students with track info (used by DesktopClient Students tab):
+     - [SelectStudentWithTrack_SP.sql](Database/SelectStudentWithTrack_SP.sql)
 
 Notes:
-- If you run [ExamCRUD_SP.sql](ExamCRUD_SP.sql) you may not need [REPORTS_SP.sql](REPORTS_SP.sql) because some report procedures appear in both.
-- [UserRoles&Enviroment.sql](UserRoles&Enviroment.sql) creates SQL logins/users and grants permissions. Review and change any placeholder passwords before using in a real environment.
+- Some procedures exist in multiple files (e.g., reports). If you get “already exists”, use `CREATE OR ALTER` or run only one definition.
+- The [Backup/](Backup/) folder contains `.bak` database backups for restoring in SQL Server.
 
-## Key Stored Procedures
+## Desktop Client
 
-### CRUD
+### Tech
 
-- `InsertBranch`, `UpdateBranch`, `DeleteBranch`, `SelectBranch`
-- `InsertTrack`, `UpdateTrack`, `DeleteTrack`, `SelectTrackByBranch`
-- `InsertCourse`, `UpdateCourse`, `DeleteCourse`, `SelectCourseByTrack`
+- Java (JDK 25 recommended)
+- JavaFX (Windows jars are included under `DesktopClient/lib/javafx/`)
+- Microsoft SQL Server JDBC driver (`DesktopClient/lib/mssql-jdbc-12.6.1.jre8.jar`)
 
-### Exams
+### Run (Windows)
 
-- `GenerateExam`  
-  Creates an exam header in `Exam`, randomly selects questions from `Question`, and fills `Exam_Question`.
+Use the batch script in repo root:
 
-Example:
+- [run-desktopclient.bat](run-desktopclient.bat)
 
-```sql
-EXEC GenerateExam
-    @CourseID = 1,
-    @ExamName = N'SQL Fundamentals - Quiz 1',
-    @NumMCQ = 10,
-    @NumTF = 5;
-```
+It compiles `DesktopClient/src/Main.java` into `DesktopClient/out` and launches the JavaFX app.
 
-To view generated questions:
+### App features (tabs)
 
-```sql
-SELECT
-    e.ExamID,
-    e.ExamName,
-    eq.OrderNo,
-    q.QuestionText,
-    q.QuestionType,
-    q.Points
-FROM Exam e
-JOIN Exam_Question eq ON e.ExamID = eq.ExamID
-JOIN Question q ON eq.QuestionID = q.QuestionID
-WHERE e.ExamID = 1
-ORDER BY eq.OrderNo;
-```
+- Branches / Tracks / Courses
+- Students (Admin only)
+- Instructors (Admin only)
+- Exams (Admin + Instructor)
+- Reports (all roles; Student role sees only “Student Grades”)
+- Procedures (Admin + Instructor)
 
-- `SubmitExamAnswers`  
-  Inserts a row into `StudentExam`, then inserts answers into `StudentAnswer` from an XML payload.
+## Roles & Logins
 
-Example:
+The [UserRoles&Enviroment.sql](Database/UserRoles&Enviroment.sql) script creates SQL logins/users and grants permissions for role-based login in the DesktopClient:
 
-```sql
-DECLARE @Answers XML = N'
-<Answers>
-  <Answer><QuestionID>1</QuestionID><ChosenOptionID>1</ChosenOptionID></Answer>
-  <Answer><QuestionID>2</QuestionID><ChosenOptionID>5</ChosenOptionID></Answer>
-</Answers>';
+- Admin
+  - Login: `ExamAdmin`
+  - Password: `Admin@123`
+  - DB role: `db_owner`
+- Instructor
+  - Login: `InstructorUser`
+  - Password: `Instructor@123`
+  - Permissions: read + execute needed stored procedures + write on exam/question tables
+- Student
+  - Login: `StudentUser`
+  - Password: `Student@123`
+  - Permissions: read + execute `SubmitExamAnswers` and `Report_StudentGrades` (and limited selects)
 
-EXEC SubmitExamAnswers
-    @StudentID = 1,
-    @ExamID = 1,
-    @StartTime = '2026-01-01T10:00:00',
-    @EndTime = '2026-01-01T10:30:00',
-    @Answers = @Answers;
-```
+## Sample Data
 
-- `CorrectExam`  
-  Computes the final grade by comparing `StudentAnswer.ChosenOptionID` with `ModelAnswer.OptionID`, then updates `StudentExam.TotalGrade`.
-
-Example:
-
-```sql
-EXEC CorrectExam @StudentExamID = 1;
-
-SELECT StudentExamID, StudentID, ExamID, TotalGrade
-FROM StudentExam
-WHERE StudentExamID = 1;
-```
-
-## Reports
-
-- `Report_StudentsByDepartment @DepartmentNo`
-- `Report_StudentGrades @StudentID`
-- `Report_InstructorCourses @InstructorID`
-
-Examples:
-
-```sql
-EXEC Report_StudentGrades @StudentID = 1;
-EXEC Report_InstructorCourses @InstructorID = 1;
-```
-
-## Roles & Permissions
-
-The [UserRoles&Enviroment.sql](UserRoles&Enviroment.sql) script demonstrates:
-
-- An admin user mapped to `db_owner`
-- An instructor user with read access plus write permissions on exam/question tables
-- A student user with read access plus insert permissions for submitting answers, while denying reads on sensitive tables like `StudentAnswer` and `ModelAnswer`
-
-## Team
-
-- Eng Shorouk Elkassas
-- Eng Mohamed Helmy
-- Eng Ahmed El Arabawy
-- Eng Mahmoud Farid
+- [sample-data.sql](Database/sample-data.sql)
+  - branches, tracks, courses, instructors, students, track-course mapping, student-track mapping, questions, options, model answers
+- [sample-exams-and-grades.sql](Database/sample-exams-and-grades.sql)
+  - two sample exams + sample grades in `StudentExam` (+ a few sample answers)
 
 ## Project Structure
 
-- `ERD/` – ERD diagram
-- `CreateDbTables.sql` – database and schema (tables)
-- `sample-data.sql` – sample seed data (branches, tracks, courses, instructors, students, questions, options, model answers)
-- `*CRUD*_SP.sql` – CRUD stored procedures
-- `ExamCRUD_SP.sql` – exam generation/submission/correction procedures (and may include report procs)
-- `REPORTS_SP.sql` – reporting stored procedures
-- `ITI_Exam_System_SRS_v3.pdf` – requirements/specification document
+- `Database/` – schema, stored procedures, seed data, utilities
+- `DesktopClient/` – JavaFX Desktop app (OOP controllers calling stored procedures)
+  - `src/` – Java sources
+  - `lib/` – JDBC + JavaFX jars
+- `Backup/` – SQL Server `.bak` backups
+- `ERD/` – ERD diagrams
+- `ITI_Exam_System_SRS_v3.pdf` – requirements/specification
+- [run-desktopclient.bat](run-desktopclient.bat) – compile+run DesktopClient on Windows
 
