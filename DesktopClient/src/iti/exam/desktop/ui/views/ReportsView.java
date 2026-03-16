@@ -20,13 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 public final class ReportsView {
-    private final AppSession session;
     private final AppContext context;
     private final BorderPane root;
     private final MapTableView table;
 
     public ReportsView(AppSession session) {
-        this.session = session;
         this.context = session.getContext();
         this.root = new BorderPane();
         this.table = new MapTableView();
@@ -127,4 +125,3 @@ public final class ReportsView {
         return context.reports().studentGrades(v1);
     }
 }
-

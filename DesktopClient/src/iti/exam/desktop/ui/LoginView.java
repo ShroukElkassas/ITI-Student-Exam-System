@@ -56,7 +56,13 @@ public final class LoginView {
                 return;
             }
             userField.setText(newV.getLoginName());
-            if (passwordField.getText() == null || passwordField.getText().trim().isEmpty()) {
+            String currentPassword = passwordField.getText();
+            String oldDefault = oldV == null ? null : defaultPasswordFor(oldV);
+            boolean shouldReplace =
+                    currentPassword == null
+                            || currentPassword.trim().isEmpty()
+                            || (oldDefault != null && oldDefault.equals(currentPassword));
+            if (shouldReplace) {
                 passwordField.setText(defaultPasswordFor(newV));
             }
         });
@@ -148,4 +154,3 @@ public final class LoginView {
         return "";
     }
 }
-

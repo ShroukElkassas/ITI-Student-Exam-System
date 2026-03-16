@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 public final class StudentsView {
-    private final AppSession session;
     private final AppContext context;
     private final BorderPane root;
     private final TableView<StudentRow> table;
@@ -38,7 +37,6 @@ public final class StudentsView {
     private final TextField trackIdField;
 
     public StudentsView(AppSession session) {
-        this.session = session;
         this.context = session.getContext();
         this.root = new BorderPane();
         this.items = FXCollections.observableArrayList();
@@ -262,4 +260,3 @@ public final class StudentsView {
         }
     }
 }
-

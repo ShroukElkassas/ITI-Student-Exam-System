@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 public final class InstructorsView {
-    private final AppSession session;
     private final AppContext context;
     private final BorderPane root;
     private final TableView<InstructorRow> table;
@@ -38,7 +37,6 @@ public final class InstructorsView {
     private final TextField courseIdField;
 
     public InstructorsView(AppSession session) {
-        this.session = session;
         this.context = session.getContext();
         this.root = new BorderPane();
         this.items = FXCollections.observableArrayList();

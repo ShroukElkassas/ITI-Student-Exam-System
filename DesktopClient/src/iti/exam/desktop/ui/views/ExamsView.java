@@ -1,7 +1,6 @@
 package iti.exam.desktop.ui.views;
 
 import iti.exam.desktop.ui.AppContext;
-import iti.exam.desktop.ui.AppRole;
 import iti.exam.desktop.ui.AppSession;
 import iti.exam.desktop.ui.FxUtils;
 import iti.exam.desktop.util.RowUtils;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 public final class ExamsView {
-    private final AppSession session;
     private final AppContext context;
     private final BorderPane root;
     private final TableView<ExamRow> table;
@@ -39,7 +37,6 @@ public final class ExamsView {
     private final TextField genTfField;
 
     public ExamsView(AppSession session) {
-        this.session = session;
         this.context = session.getContext();
         this.root = new BorderPane();
         this.items = FXCollections.observableArrayList();
@@ -271,4 +268,3 @@ public final class ExamsView {
         }
     }
 }
-
