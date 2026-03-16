@@ -1,0 +1,18 @@
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Java build outputs
+**/out/
+**/bin/
+*.class
+
+# JavaFX runtime cache
+javafx-cache/
+**/javafx-cache/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
