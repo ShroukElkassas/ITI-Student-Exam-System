@@ -40,15 +40,15 @@ GO
 -- ROLE 3: Student ? db_datareader (read only)
 
 -- Read-only access on all tables
-ALTER ROLE db_datareader ADD MEMBER StudentUser;
+ALTER ROLE db_datareader 
+ADD MEMBER StudentUser;
 GO
 
 -- Allow student to submit answers and view their own results
-GRANT INSERT ON StudentExam   TO StudentUser;
-GRANT INSERT ON StudentAnswer TO StudentUser;
+GRANT EXECUTE ON OBJECT::SubmitExamAnswers TO StudentUser;
 GO
 
 -- Deny access to sensitive tables (student cannot see other students' answers)
-DENY SELECT ON StudentAnswer TO StudentUser;
+GRANT EXECUTE ON OBJECT::Report_StudentGrades TO StudentUser;
 DENY SELECT ON ModelAnswer   TO StudentUser;
 GO
