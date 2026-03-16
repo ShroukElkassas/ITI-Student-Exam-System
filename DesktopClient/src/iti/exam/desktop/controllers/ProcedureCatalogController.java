@@ -65,9 +65,9 @@ public final class ProcedureCatalogController {
                 List<Map<String, Object>> rows = ResultSetUtils.readAllRows(rs);
                 List<StoredProcedureParam> params = new ArrayList<StoredProcedureParam>();
                 for (Map<String, Object> row : rows) {
-                    int id = ((Number) row.get("ParameterId")).intValue();
+                    int id = toInt(row.get("ParameterId"));
                     String name = String.valueOf(row.get("ParamName"));
-                    boolean isOutput = ((Number) row.get("IsOutput")).intValue() == 1;
+                    boolean isOutput = toBoolean(row.get("IsOutput"));
                     String typeName = String.valueOf(row.get("TypeName"));
                     params.add(new StoredProcedureParam(id, name, isOutput, typeName));
                 }
@@ -128,5 +128,44 @@ public final class ProcedureCatalogController {
         if ("varbinary".equals(t) || "binary".equals(t) || "image".equals(t)) return Types.VARBINARY;
         return Types.OTHER;
     }
-}
 
+    private static int toInt(Object value) {
+        if (value == null) {
+            return 0;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        if (value instanceof Boolean) {
+            return ((Boolean) value) ? 1 : 0;
+        }
+        try {
+            return Integer.parseInt(String.valueOf(value));
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
+
+    private static boolean toBoolean(Object value) {
+        if (value == null) {
+            return false;
+        }
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue() != 0;
+        }
+        String s = String.valueOf(value).trim();
+        if (s.isEmpty()) {
+            return false;
+        }
+        if ("1".equals(s)) {
+            return true;
+        }
+        if ("0".equals(s)) {
+            return false;
+        }
+        return Boolean.parseBoolean(s);
+    }
+}

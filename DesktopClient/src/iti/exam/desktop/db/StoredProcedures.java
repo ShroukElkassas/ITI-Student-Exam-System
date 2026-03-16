@@ -25,7 +25,11 @@ public final class StoredProcedures {
 
     public static final String INSERT_INSTRUCTOR = "InsertInstructor";
     public static final String UPDATE_INSTRUCTOR = "UpdateInstructor";
+    public static final String DELETE_INSTRUCTOR = "DeleteInstructor";
+    public static final String SELECT_INSTRUCTOR = "SelectInstructor";
     public static final String ASSIGN_INSTRUCTOR_TO_COURSE = "AssignInstructorToCourse";
+    public static final String INSERT_INSTRUCTOR_COURSE = "InsertInstructorCourse";
+    public static final String UPDATE_INSTRUCTOR_COURSE = "UpdateInstructorCourse";
     public static final String DELETE_INSTRUCTOR_COURSE = "DeleteInstructorCourse";
     public static final String SELECT_INSTRUCTOR_COURSE = "SelectInstructorCourse";
 

@@ -41,6 +41,18 @@ public final class FxApp extends Application {
         tabs.getTabs().add(wrap("Branches", new iti.exam.desktop.ui.views.BranchesView(session).getNode()));
         tabs.getTabs().add(wrap("Tracks", new iti.exam.desktop.ui.views.TracksView(session).getNode()));
         tabs.getTabs().add(wrap("Courses", new iti.exam.desktop.ui.views.CoursesView(session).getNode()));
+
+        if (session.getRole() == iti.exam.desktop.ui.AppRole.ADMIN) {
+            tabs.getTabs().add(wrap("Students", new iti.exam.desktop.ui.views.StudentsView(session).getNode()));
+            tabs.getTabs().add(wrap("Instructors", new iti.exam.desktop.ui.views.InstructorsView(session).getNode()));
+        }
+
+        if (session.getRole().canManageQuestionsAndExams()) {
+            tabs.getTabs().add(wrap("Exams", new iti.exam.desktop.ui.views.ExamsView(session).getNode()));
+        }
+
+        tabs.getTabs().add(wrap("Reports", new iti.exam.desktop.ui.views.ReportsView(session).getNode()));
+
         if (session.getRole().canManageQuestionsAndExams()) {
             tabs.getTabs().add(wrap("Procedures", new iti.exam.desktop.ui.views.ProceduresView(session).getNode()));
         }

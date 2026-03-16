@@ -5,8 +5,10 @@ import iti.exam.desktop.models.StoredProcedureParam;
 import iti.exam.desktop.ui.AppContext;
 import iti.exam.desktop.ui.AppSession;
 import iti.exam.desktop.ui.FxUtils;
+import iti.exam.desktop.db.StoredProcedures;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -15,30 +17,37 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public final class ProceduresView {
+    private final AppSession session;
     private final AppContext context;
     private final BorderPane root;
     private final ObservableList<StoredProcedureInfo> procedures;
     private final ObservableList<ParamRow> params;
 
     public ProceduresView(AppSession session) {
+        this.session = session;
         this.context = session.getContext();
         this.root = new BorderPane();
         this.procedures = FXCollections.observableArrayList();
         this.params = FXCollections.observableArrayList();
 
-        ListView<StoredProcedureInfo> list = new ListView<StoredProcedureInfo>(procedures);
+        FilteredList<StoredProcedureInfo> filtered = new FilteredList<StoredProcedureInfo>(procedures, p -> true);
+        ListView<StoredProcedureInfo> list = new ListView<StoredProcedureInfo>(filtered);
         list.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         TableView<ParamRow> table = new TableView<ParamRow>(params);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<ParamRow, Integer> idCol = new TableColumn<ParamRow, Integer>("Order");
         idCol.setCellValueFactory(new PropertyValueFactory<ParamRow, Integer>("parameterId"));
@@ -55,12 +64,27 @@ public final class ProceduresView {
         outCol.setCellValueFactory(new PropertyValueFactory<ParamRow, Boolean>("output"));
         outCol.setMaxWidth(100);
 
-        table.getColumns().addAll(idCol, nameCol, typeCol, outCol);
+        table.getColumns().add(idCol);
+        table.getColumns().add(nameCol);
+        table.getColumns().add(typeCol);
+        table.getColumns().add(outCol);
+
+        TextField filterField = new TextField();
+        filterField.setPromptText("Filter procedures...");
+        filterField.textProperty().addListener((obs, oldV, newV) -> {
+            final String q = newV == null ? "" : newV.trim().toLowerCase(Locale.ROOT);
+            filtered.setPredicate(p -> {
+                if (q.isEmpty()) {
+                    return true;
+                }
+                return p.getFullName().toLowerCase(Locale.ROOT).contains(q);
+            });
+        });
 
         Button refreshBtn = new Button("Refresh");
         refreshBtn.setOnAction(e -> refreshProcedures());
 
-        HBox topBar = new HBox(10, refreshBtn);
+        HBox topBar = new HBox(10, refreshBtn, filterField);
         topBar.setPadding(new Insets(10));
 
         VBox left = new VBox(6, new Label("Procedures"), list);
@@ -91,13 +115,43 @@ public final class ProceduresView {
 
     private void refreshProcedures() {
         FxUtils.runAsync(
-                () -> context.catalog().listStoredProcedures(),
+                () -> {
+                    if (session.getRole() == iti.exam.desktop.ui.AppRole.ADMIN) {
+                        return context.catalog().listStoredProcedures();
+                    }
+                    return listKnownProcedures();
+                },
                 list -> {
                     procedures.setAll(list);
                     params.clear();
                 },
                 ex -> FxUtils.showError("Load procedures failed", ex.getMessage())
         );
+    }
+
+    private static List<StoredProcedureInfo> listKnownProcedures() {
+        List<StoredProcedureInfo> result = new ArrayList<StoredProcedureInfo>();
+        Field[] fields = StoredProcedures.class.getDeclaredFields();
+        for (Field f : fields) {
+            int mods = f.getModifiers();
+            if (!Modifier.isStatic(mods) || !Modifier.isFinal(mods) || f.getType() != String.class) {
+                continue;
+            }
+            try {
+                Object v = f.get(null);
+                if (v == null) {
+                    continue;
+                }
+                String name = String.valueOf(v).trim();
+                if (name.isEmpty()) {
+                    continue;
+                }
+                result.add(new StoredProcedureInfo("dbo", name));
+            } catch (IllegalAccessException ignored) {
+            }
+        }
+        result.sort((a, b) -> a.getFullName().compareToIgnoreCase(b.getFullName()));
+        return result;
     }
 
     private void loadParams(StoredProcedureInfo info) {

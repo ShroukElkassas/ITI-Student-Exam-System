@@ -1,0 +1,9 @@
+{
+  "java.project.sourcePaths": [
+    "DesktopClient/src"
+  ],
+  "java.project.referencedLibraries": [
+    "DesktopClient/lib/**/*.jar"
+  ]
+}
+

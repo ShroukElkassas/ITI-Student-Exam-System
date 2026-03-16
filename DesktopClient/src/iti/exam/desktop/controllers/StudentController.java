@@ -66,7 +66,7 @@ public final class StudentController {
 
     public void assignStudentToTrack(int studentId, int trackId) throws SQLException {
         executor.execute(
-                StoredProcedures.ASSIGN_STUDENT_TO_TRACK,
+                StoredProcedures.INSERT_STUDENT_TRACK,
                 SqlParam.in(Types.INTEGER, studentId),
                 SqlParam.in(Types.INTEGER, trackId)
         );

@@ -20,11 +20,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public final class BranchesView {
-    private final AppSession session;
     private final AppContext context;
     private final BorderPane root;
     private final TableView<BranchRow> table;
@@ -34,14 +32,12 @@ public final class BranchesView {
     private final TextField locationField;
 
     public BranchesView(AppSession session) {
-        this.session = session;
         this.context = session.getContext();
         this.root = new BorderPane();
         this.items = FXCollections.observableArrayList();
 
         this.table = new TableView<BranchRow>(items);
         this.table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        this.table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<BranchRow, Integer> idCol = new TableColumn<BranchRow, Integer>("ID");
         idCol.setCellValueFactory(new PropertyValueFactory<BranchRow, Integer>("branchId"));
@@ -53,7 +49,9 @@ public final class BranchesView {
         TableColumn<BranchRow, String> locCol = new TableColumn<BranchRow, String>("Location");
         locCol.setCellValueFactory(new PropertyValueFactory<BranchRow, String>("location"));
 
-        this.table.getColumns().addAll(idCol, nameCol, locCol);
+        this.table.getColumns().add(idCol);
+        this.table.getColumns().add(nameCol);
+        this.table.getColumns().add(locCol);
 
         Button refreshBtn = new Button("Refresh");
         refreshBtn.setOnAction(e -> refresh());
