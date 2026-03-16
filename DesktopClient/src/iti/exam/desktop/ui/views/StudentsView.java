@@ -57,10 +57,19 @@ public final class StudentsView {
         TableColumn<StudentRow, String> phoneCol = new TableColumn<StudentRow, String>("Phone");
         phoneCol.setCellValueFactory(new PropertyValueFactory<StudentRow, String>("phone"));
 
+        TableColumn<StudentRow, Integer> trackIdCol = new TableColumn<StudentRow, Integer>("TrackID");
+        trackIdCol.setCellValueFactory(new PropertyValueFactory<StudentRow, Integer>("trackId"));
+        trackIdCol.setMaxWidth(120);
+
+        TableColumn<StudentRow, String> trackNameCol = new TableColumn<StudentRow, String>("Track");
+        trackNameCol.setCellValueFactory(new PropertyValueFactory<StudentRow, String>("trackName"));
+
         this.table.getColumns().add(idCol);
         this.table.getColumns().add(nameCol);
         this.table.getColumns().add(emailCol);
         this.table.getColumns().add(phoneCol);
+        this.table.getColumns().add(trackIdCol);
+        this.table.getColumns().add(trackNameCol);
 
         Button refreshBtn = new Button("Refresh");
         refreshBtn.setOnAction(e -> refresh());
@@ -117,6 +126,7 @@ public final class StudentsView {
             nameField.setText(newV.getStudentName());
             emailField.setText(newV.getEmail());
             phoneField.setText(newV.getPhone());
+            trackIdField.setText(newV.getTrackId() == null ? "" : String.valueOf(newV.getTrackId()));
         });
 
         root.setTop(topBar);
@@ -145,7 +155,9 @@ public final class StudentsView {
             String name = RowUtils.toNullableString(RowUtils.getIgnoreCase(row, "StudentName"));
             String email = RowUtils.toNullableString(RowUtils.getIgnoreCase(row, "Email"));
             String phone = RowUtils.toNullableString(RowUtils.getIgnoreCase(row, "Phone"));
-            list.add(new StudentRow(id, name, email, phone));
+            Integer trackId = RowUtils.toNullableInt(RowUtils.getIgnoreCase(row, "TrackID"));
+            String trackName = RowUtils.toNullableString(RowUtils.getIgnoreCase(row, "TrackName"));
+            list.add(new StudentRow(id, name, email, phone, trackId, trackName));
         }
         items.setAll(list);
     }
@@ -235,12 +247,16 @@ public final class StudentsView {
         private final String studentName;
         private final String email;
         private final String phone;
+        private final Integer trackId;
+        private final String trackName;
 
-        public StudentRow(int studentId, String studentName, String email, String phone) {
+        public StudentRow(int studentId, String studentName, String email, String phone, Integer trackId, String trackName) {
             this.studentId = studentId;
             this.studentName = studentName;
             this.email = email;
             this.phone = phone;
+            this.trackId = trackId;
+            this.trackName = trackName;
         }
 
         public int getStudentId() {
@@ -257,6 +273,14 @@ public final class StudentsView {
 
         public String getPhone() {
             return phone;
+        }
+
+        public Integer getTrackId() {
+            return trackId;
+        }
+
+        public String getTrackName() {
+            return trackName;
         }
     }
 }

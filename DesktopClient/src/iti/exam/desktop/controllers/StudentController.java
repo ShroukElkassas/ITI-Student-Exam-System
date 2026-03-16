@@ -57,11 +57,22 @@ public final class StudentController {
     }
 
     public List<Map<String, Object>> selectStudents(Integer studentId) throws SQLException {
-        StoredProcResult result = executor.execute(
-                StoredProcedures.SELECT_STUDENT,
-                SqlParam.in(Types.INTEGER, studentId)
-        );
-        return result.firstResultSetOrEmpty();
+        try {
+            StoredProcResult result = executor.execute(
+                    StoredProcedures.SELECT_STUDENT_WITH_TRACK,
+                    SqlParam.in(Types.INTEGER, studentId)
+            );
+            return result.firstResultSetOrEmpty();
+        } catch (SQLException ex) {
+            if (isMissingProcedure(ex)) {
+                StoredProcResult result = executor.execute(
+                        StoredProcedures.SELECT_STUDENT,
+                        SqlParam.in(Types.INTEGER, studentId)
+                );
+                return result.firstResultSetOrEmpty();
+            }
+            throw ex;
+        }
     }
 
     public void assignStudentToTrack(int studentId, int trackId) throws SQLException {
@@ -70,5 +81,14 @@ public final class StudentController {
                 SqlParam.in(Types.INTEGER, studentId),
                 SqlParam.in(Types.INTEGER, trackId)
         );
+    }
+
+    private static boolean isMissingProcedure(SQLException ex) {
+        String msg = ex.getMessage();
+        if (msg == null) {
+            return false;
+        }
+        msg = msg.toLowerCase();
+        return msg.contains("could not find stored procedure") || msg.contains("not found");
     }
 }

@@ -53,6 +53,7 @@ public final class StoredProcedures {
     public static final String UPDATE_STUDENT = "UpdateStudent";
     public static final String DELETE_STUDENT = "DeleteStudent";
     public static final String SELECT_STUDENT = "SelectStudent";
+    public static final String SELECT_STUDENT_WITH_TRACK = "SelectStudentWithTrack";
     public static final String ASSIGN_STUDENT_TO_TRACK = "AssignStudentToTrack";
 
     public static final String INSERT_STUDENT_TRACK = "InsertStudentTrack";
