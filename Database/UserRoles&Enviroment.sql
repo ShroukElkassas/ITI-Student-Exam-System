@@ -92,6 +92,10 @@ GO
 GRANT EXECUTE ON OBJECT::dbo.SelectBranch TO StudentUser;
 GRANT EXECUTE ON OBJECT::dbo.SelectTrackByBranch TO StudentUser;
 GRANT EXECUTE ON OBJECT::dbo.SelectCourseByTrack TO StudentUser;
+GRANT EXECUTE ON OBJECT::dbo.SelectExam TO StudentUser;
+GRANT EXECUTE ON OBJECT::dbo.SelectStudent TO StudentUser;
+GRANT EXECUTE ON OBJECT::dbo.SelectStudentWithTrack TO StudentUser;
+GRANT EXECUTE ON OBJECT::dbo.GetExamPaper TO StudentUser;
 GRANT EXECUTE ON OBJECT::dbo.Report_StudentGrades TO StudentUser;
 GRANT EXECUTE ON OBJECT::dbo.SubmitExamAnswers TO StudentUser;
 GO

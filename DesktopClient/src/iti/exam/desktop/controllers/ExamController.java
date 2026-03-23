@@ -83,6 +83,14 @@ public final class ExamController {
         return result.firstResultSetOrEmpty();
     }
 
+    public List<Map<String, Object>> getExamPaper(int examId) throws SQLException {
+        StoredProcResult result = executor.execute(
+                StoredProcedures.GET_EXAM_PAPER,
+                SqlParam.in(Types.INTEGER, examId)
+        );
+        return result.firstResultSetOrEmpty();
+    }
+
     public void insertExamQuestion(int examId, int questionId, Integer orderNo) throws SQLException {
         executor.execute(
                 StoredProcedures.INSERT_EXAM_QUESTION,
@@ -205,4 +213,3 @@ public final class ExamController {
         return Integer.parseInt(String.valueOf(value));
     }
 }
-

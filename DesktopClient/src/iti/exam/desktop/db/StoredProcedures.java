@@ -70,6 +70,7 @@ public final class StoredProcedures {
     public static final String UPDATE_EXAM = "UpdateExam";
     public static final String DELETE_EXAM = "DeleteExam";
     public static final String SELECT_EXAM = "SelectExam";
+    public static final String GET_EXAM_PAPER = "GetExamPaper";
 
     public static final String INSERT_EXAM_QUESTION = "InsertExamQuestion";
     public static final String UPDATE_EXAM_QUESTION = "UpdateExamQuestion";

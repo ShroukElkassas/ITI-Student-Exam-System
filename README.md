@@ -48,6 +48,8 @@ Run scripts from the [Database/](Database/) folder in this order:
      - [assign-students-to-tracks-random.sql](Database/assign-students-to-tracks-random.sql)
    - Select students with track info (used by DesktopClient Students tab):
      - [SelectStudentWithTrack_SP.sql](Database/SelectStudentWithTrack_SP.sql)
+   - Load full exam paper (used by DesktopClient Student “Take Exam”):
+     - [GetExamPaper_SP.sql](Database/GetExamPaper_SP.sql)
 
 Notes:
 - Some procedures exist in multiple files (e.g., reports). If you get “already exists”, use `CREATE OR ALTER` or run only one definition.
@@ -74,8 +76,13 @@ It compiles `DesktopClient/src/Main.java` into `DesktopClient/out` and launches 
 - Branches / Tracks / Courses
 - Students (Admin only)
 - Instructors (Admin only)
+- Question Bank (Admin + Instructor)
+- Exam Composer (Admin + Instructor)
 - Exams (Admin + Instructor)
-- Reports (all roles; Student role sees only “Student Grades”)
+- Home (Student only)
+- Take Exam (Student only)
+- My Grades (Student only)
+- Reports (all roles)
 - Procedures (Admin + Instructor)
 
 ## Media
@@ -85,6 +92,10 @@ It compiles `DesktopClient/src/Main.java` into `DesktopClient/out` and launches 
 ![Login by role](media/Login%20by%20role.png)
 
 ![CRUD Operations](media/Crud%20Operations.png)
+
+![Exam Composer](media/Exam%20Composer.png)
+
+![Take Exam](media/Take%20Exam.png)
 
 ### Video
 
@@ -105,7 +116,7 @@ The [UserRoles&Enviroment.sql](Database/UserRoles&Enviroment.sql) script creates
 - Student
   - Login: `StudentUser`
   - Password: `Student@123`
-  - Permissions: read + execute `SubmitExamAnswers` and `Report_StudentGrades` (and limited selects)
+  - Permissions: read + execute student procedures (`GetExamPaper`, `SubmitExamAnswers`, `Report_StudentGrades`) and limited selects
 
 ## Sample Data
 
