@@ -1,6 +1,6 @@
 
 
-CREATE PROCEDURE InsertInstructor
+CREATE OR ALTER PROCEDURE InsertInstructor
     @Name NVARCHAR(100), 
     @Email NVARCHAR(255), 
     @DeptNo INT
@@ -16,7 +16,7 @@ GO
 
 
 
-CREATE PROCEDURE UpdateInstructor
+CREATE OR ALTER PROCEDURE UpdateInstructor
     @ID INT, 
     @Name NVARCHAR(100), 
     @Email NVARCHAR(255), 
@@ -32,7 +32,7 @@ GO
 
 
 
-CREATE PROCEDURE AssignInstructorToCourse
+CREATE OR ALTER PROCEDURE AssignInstructorToCourse
     @InstID INT, 
     @CourseID INT
 AS
@@ -43,7 +43,7 @@ END;
 GO
 
 
-CREATE PROCEDURE DeleteInstructorCourse
+CREATE OR ALTER PROCEDURE DeleteInstructorCourse
     @InstructorID INT,
     @CourseID INT
 AS
@@ -77,7 +77,7 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE SelectInstructorCourse
+CREATE OR ALTER PROCEDURE SelectInstructorCourse
     @InstructorID INT = NULL,
     @CourseID INT = NULL
 AS
